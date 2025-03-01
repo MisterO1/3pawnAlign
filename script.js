@@ -195,9 +195,7 @@ document.addEventListener("mouseup", function(e){
     active = false
     currentpawn = null
 
-    if (turn > 6){ 
+    if ((turn >= 7)&&(mode=="preNormal")){ 
         mode = "normal" // all pawn are inside the board.
     }
-
-    
 })

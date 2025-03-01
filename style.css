@@ -1,32 +1,65 @@
-.player-information{
-    display: grid;
-    grid-template-columns: 60px 180px 100px;
-    width: max-content;
-    padding: 20px;
+section {
+    /* width: 100vw; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 1px solid red;
+}
+.presentation{
+    width: fit-content;
+    padding: 5px;
+    border: 1px solid rgb(28, 51, 133);
+
+    height: fit-content;
 }
 
 .board{
     display: flex;
     flex-direction: column;
-    width: fit-content;
+    justify-content: center;
+    align-items: center;
+    width: 350px;
+    height: 500px;
+    background-color: rgb(91, 232, 197);
+    border: 1px solid rgb(0, 255, 94);
 }
-
-.front{
+.board-result{
+    width: 350px;
+    height: 500px;
+    background-color: aliceblue;
+    border: 1px solid rgb(0, 255, 94);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.board-result .result{
+    width: 60%;
+    height: fit-content;
+    padding: 30px;
+    border: 1px solid red;
+}
+.player-information{
+    display: grid;
+    grid-template-columns: 50px 150px 100px;
+    width: max-content;
+    padding: 10px 5px;
+    border: 1px solid red;
+}
+.front-entry{
     width: fit-content;
     height: fit-content;
     border: 1px solid red;
     display: grid;
-    grid-template-columns: repeat(3,100px);
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(3,70px);
+    gap: 10px;
+    padding: 10px;
 }
 .entry{
     /* position: relative; */
-    background-color: rgb(204, 209, 209);
+    background-color: rgb(255, 255, 255);
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,8 +78,8 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    padding: 20px;
+    gap: 10px;
+    padding: 10px;
 }
 .pawn{
     border: none;
@@ -55,10 +88,10 @@
     height: 70px;
 }
 .pawn[id^="a"]{
-    background-color: rgb(27, 27, 147);
+    background-color: rgb(40, 77, 238);
 }
 .pawn[id^="b"]{
-    background-color: rgb(135, 25, 25);
+    background-color: rgb(198, 21, 21);
 }
 .pawn:hover{
     cursor: pointer;
