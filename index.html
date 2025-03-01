@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>3 POINTS GAME</title>
+</head>
+<body>
+    <section>
+        <div class="presentation">
+            <div class="board">
+                <div class="player-information player-information1">
+                    <div class="photo photo1">PP</div>
+                    <div class="name name1">player1Name</div>
+                    <div class="time time1">60s</div>
+                </div>
+                <div class="front-pawns front-pawns-player1">
+                    <div class="pawn" id="a1"></div>
+                    <div class="pawn" id="a2"></div>
+                    <div class="pawn" id="a3"></div>
+                </div>
+                <div class="front">
+                    <div class="entry" id="e-1+1"></div>
+                    <div class="entry" id="e0+1"></div>
+                    <div class="entry" id="e+1+1"></div>
+                    <div class="entry" id="e-1+0"></div>
+                    <div class="entry" id="e0+0"></div>
+                    <div class="entry" id="e+1+0"></div>
+                    <div class="entry" id="e-1-1"></div>
+                    <div class="entry" id="e0-1"></div>
+                    <div class="entry" id="e+1-1"></div>
+                </div>
+                <div class="front-pawns front-pawns-player2">
+                    <div class="pawn" id="b1"></div>
+                    <div class="pawn" id="b2"></div>
+                    <div class="pawn" id="b3"></div>
+                </div>
+                <div class="player-information player-information1">
+                    <div class="photo photo1">PP</div>
+                    <div class="name name1">player2Name</div>
+                    <div class="time time1">60s</div>
+                </div>
+            </div>
+            <div class="turn">
+                <div class="player p1">
+                    <div class="status"></div>
+                </div>
+                <div class="player p2">
+                    <div class="status"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
