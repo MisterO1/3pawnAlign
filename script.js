@@ -1,3 +1,6 @@
+const board = document.querySelector(".board")
+const boardResult = document.querySelector(".board-result")
+
 class entry {
     constructor(name,coordinates,elt) {
         this.name = name ;
@@ -10,35 +13,41 @@ class entry {
         this.legalEntries = null
     }
 }
-const x1 = new entry("x1",coord("e-1+1"),document.getElementById("e-1+1"))
-const x2 = new entry("x2",coord("e0+1"),document.getElementById("e0+1"))
-const x3 = new entry("x3",coord("e+1+1"),document.getElementById("e+1+1"))
-const y1 = new entry("y1",coord("e-1+0"),document.getElementById("e-1+0"))
-const y2 = new entry("y2",coord("e0+0"),document.getElementById("e0+0"))
-const y3 = new entry("y3",coord("e+1+0"),document.getElementById("e+1+0"))
-const z1 = new entry("z1",coord("e-1-1"),document.getElementById("e-1-1"))
-const z2 = new entry("z2",coord("e0-1"),document.getElementById("e0-1"))
-const z3 = new entry("z3",coord("e+1-1"),document.getElementById("e+1-1"))
+const x1 = new entry("x1",[-1,1],document.getElementById("x1"))
+const x2 = new entry("x2",[0,1],document.getElementById("x2"))
+const x3 = new entry("x3",[1,1],document.getElementById("x3"))
+const y1 = new entry("y1",[-1,0],document.getElementById("y1"))
+const y2 = new entry("y2",[0,0],document.getElementById("y2"))
+const y3 = new entry("y3",[1,0],document.getElementById("y3"))
+const z1 = new entry("z1",[-1,-1],document.getElementById("z1"))
+const z2 = new entry("z2",[0,-1],document.getElementById("z2"))
+const z3 = new entry("z3",[1,-1],document.getElementById("z3"))
+let listEntry = [x1,x2,x3,y1,y2,y3,z1,z2,z3]
+
 //definition of legalEntries
 x1.legalEntries = [y2,x2,y1]
 x2.legalEntries = [y2,x3,x1]
 x3.legalEntries = [y2,x2,y3]
 y1.legalEntries = [y2,x1,z1]
-y2.legalEntries = [x1,x2,x3,y1,y3,z1,z2,z3,y2]
+y2.legalEntries = [x1,x2,x3,y1,y3,z1,z2,z3]
 y3.legalEntries = [y2,x3,z3]
 z1.legalEntries = [y2,y1,z2]
 z2.legalEntries = [y2,z1,z3]
 z3.legalEntries = [y2,z2,y3]
 
+// generique container to permit the move all over the board at starting
+containerGEN = {
+    legalEntries: listEntry
+}
+
 class pawn {
     constructor(name,elt) {
         this.name = name ;
         this.elt = elt ;
-        this.coordinates = null ;
         this.id = this.elt.id ;
         this.initialX = center(this.elt)[0];
         this.initialY = center(this.elt)[1];
-        this.container = y2; // just to permit to move the pawn all over the board
+        this.container = containerGEN; // just to permit to move the pawn all over the board
         this.status = "outside"; // outside the board
     }
 }
@@ -50,33 +59,10 @@ const b1 = new pawn("b1",document.getElementById("b1"))
 const b2 = new pawn("b2",document.getElementById("b2"))
 const b3 = new pawn("b3",document.getElementById("b3"))
 
-function coord (ch){
-    switch (ch){
-        case "e-1+1":
-            return [-1,1]
-        case "e0+1":
-            return [0,1]
-        case "e+1+1":
-            return [1,1]
-        case "e-1+0":
-            return [-1,0]
-        case "e0+0":
-            return [0,0]
-        case "e+1+0":
-            return [1,0]
-        case "e-1-1":
-            return [-1,-1]
-        case "e0-1":
-            return [0,-1]
-        case "e+1-1":
-            return [1,-1]
-    }
-}
-
 let Winner ;
 let listPawns = [a1,a2,a3,b1,b2,b3]
-let listEntry = [x1,x2,x3,y1,y2,y3,z1,z2,z3]
-let currentX, currentY
+let currentX;
+let currentY;
 let active = false
 let currentpawn ;
 let turn = 1 // only blue pawn can be played when turn = 1. same for player2 when turn = 2
@@ -93,10 +79,8 @@ listPawns.forEach((p)=>{
                     currentpawn = p
                 }
             }
-            
         })
     }
-    
 })
 
 document.addEventListener("mousemove", function(e){
@@ -140,7 +124,7 @@ function isAlign(pawn1,pawn2,pawn3){
     (pawn2.container.coordinates[1]==pawn3.container.coordinates[1]))
     {return true}
 
-    // diagonale alignement => 2 possibilities (y=x ou y=-x)
+    // diagonale alignement => 2 possibilities (y=x or y=-x)
     if (((pawn1.container.coordinates[0]==pawn1.container.coordinates[1])&&
     (pawn2.container.coordinates[0]==pawn2.container.coordinates[1])&&
     (pawn3.container.coordinates[0]==pawn3.container.coordinates[1]))
@@ -157,14 +141,14 @@ function isAlign(pawn1,pawn2,pawn3){
 document.addEventListener("mouseup", function(e){
     if (!active){return }
     currentpawn.elt.style.transform = `translate3d(${0}px,${0}px, 0)`
-    for (anEntry of currentpawn.container.legalEntries){
-        if (isInside(anEntry.elt, e.clientX, e.clientY)){
-            if (!anEntry.filled){
-                anEntry.elt.appendChild(currentpawn.elt)
-                anEntry.filled = true
-                anEntry.filledPawn = currentpawn
+    for (ent of currentpawn.container.legalEntries){
+        if (isInside(ent.elt, e.clientX, e.clientY)){
+            if (!ent.filled){
+                ent.elt.appendChild(currentpawn.elt)
+                ent.filled = true
+                ent.filledPawn = currentpawn
                 currentpawn.container.filled = false
-                currentpawn.container = anEntry
+                currentpawn.container = ent
                 currentpawn.status = "inside"
                 
                 if (turn>=5){
@@ -173,12 +157,16 @@ document.addEventListener("mouseup", function(e){
                             mode = "Ended"
                             Winner = "PLAYER 1"
                             console.log(Winner+"Win")
+                            board.style.display = "none"
+                            boardResult.style.display = "flex"
                         }
                     }else{
                         if (isAlign(b1,b2,b3)){
                             mode = "Ended"
                             Winner = "PLAYER 2"
                             console.log(Winner+"Win")
+                            board.style.display = "none"
+                            boardResult.style.display = "flex"
                         }
                     }
                 }
@@ -198,4 +186,33 @@ document.addEventListener("mouseup", function(e){
     if ((turn >= 7)&&(mode=="preNormal")){ 
         mode = "normal" // all pawn are inside the board.
     }
+})
+
+let newParty = document.querySelector(".new-party")
+let p1 = document.querySelector(".front-pawns-player1")
+let p2 = document.querySelector(".front-pawns-player2")
+newParty.addEventListener("click", ()=>{
+    p1.appendChild(a1.elt)
+    p1.appendChild(a2.elt)
+    p1.appendChild(a3.elt)
+    p2.appendChild(b1.elt)
+    p2.appendChild(b2.elt)
+    p2.appendChild(b3.elt)
+
+    boardResult.style.display = "none"
+    board.style.display = "flex"
+
+    listPawns.forEach((p)=> {
+        p.initialX = center(p.elt)[0]
+        p.initialY = center(p.elt)[1]
+        p.status = "outside"
+        p.container = containerGEN
+    })
+    listEntry.forEach((ent)=> {
+        ent.filled = false ;
+        ent.filledPawn = null;
+    })
+    mode = "preNormal"
+    turn = 1
+
 })
