@@ -64,19 +64,40 @@ let listPawns = [a1,a2,a3,b1,b2,b3]
 let currentX;
 let currentY;
 let active = false
-let currentpawn ;
+let activeMove = ""
+let currentpawn = a1 ;//initialiser
+let oldpawn = Object.create(currentpawn) ;//initialiser
 let turn = 1 // only blue pawn can be played when turn = 1. same for player2 when turn = 2
 let mode = "preNormal" // only outside pawn can be played
 
-
 listPawns.forEach((p)=>{
     if (mode != "Ended"){
+        // MOUSING
         p.elt.addEventListener("mousedown", function(){
             if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
                 if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
                     // indique le debut du mouvement
                     active = true
+                    activeMove = "mousing"
+                    
+                    oldpawn = Object.create(currentpawn)
+                    oldpawn.elt.classList.remove("selected")
                     currentpawn = p
+                    currentpawn.elt.classList.add("selected")
+                }
+            }
+        })
+        // SELECTING
+        p.elt.addEventListener("click", function(){
+            if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
+                if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
+                    // indique le debut du mouvement
+                    active = true
+                    activeMove = "selecting"
+
+                    oldpawn.elt.classList.remove("selected")
+                    currentpawn = p // facultative because already done in mousing part
+                    currentpawn.elt.classList.add("selected")
                 }
             }
         })
@@ -85,6 +106,7 @@ listPawns.forEach((p)=>{
 
 document.addEventListener("mousemove", function(e){
     if (!active){return }
+    if (activeMove != "mousing"){return }
     e.preventDefault()
     
     currentX = e.clientX - currentpawn.initialX
@@ -111,7 +133,6 @@ function center(element){
          (bounds.top+bounds.bottom)/2  ]
     )
 }
-
 //check the alignement
 function isAlign(pawn1,pawn2,pawn3){
     // horizontale alignement 
@@ -136,10 +157,11 @@ function isAlign(pawn1,pawn2,pawn3){
 
     return false
 }
-
-
+//MOUSING - place the pawn
 document.addEventListener("mouseup", function(e){
     if (!active){return }
+    if (activeMove != "mousing"){return }
+
     currentpawn.elt.style.transform = `translate3d(${0}px,${0}px, 0)`
     for (ent of currentpawn.container.legalEntries){
         if (isInside(ent.elt, e.clientX, e.clientY)){
@@ -150,30 +172,29 @@ document.addEventListener("mouseup", function(e){
                 currentpawn.container.filled = false
                 currentpawn.container = ent
                 currentpawn.status = "inside"
-                
+                // Alignement verification
                 if (turn>=5){
-                    if (turn%2 != 0){
+                    if (turn%2!=0){
                         if (isAlign(a1,a2,a3)){
                             mode = "Ended"
                             Winner = "PLAYER 1"
                             console.log(Winner+"Win")
-                            board.style.display = "none"
-                            boardResult.style.display = "flex"
+                            document.querySelector(".result span").innerHTML = Winner
+                            boardResult.style.display = "grid"
                         }
-                    }else{
-                        if (isAlign(b1,b2,b3)){
-                            mode = "Ended"
-                            Winner = "PLAYER 2"
-                            console.log(Winner+"Win")
-                            board.style.display = "none"
-                            boardResult.style.display = "flex"
-                        }
+                    }else if (isAlign(b1,b2,b3)){
+                        mode = "Ended"
+                        Winner = "PLAYER 2"
+                        console.log(Winner+"Win")
+                        document.querySelector(".result span").innerHTML = Winner
+                        boardResult.style.display = "grid"
                     }
                 }
-
                 turn++
                 break
             }
+            
+            
         }
     }
     listPawns.forEach((p)=>{
@@ -181,11 +202,55 @@ document.addEventListener("mouseup", function(e){
         p.initialY = center(p.elt)[1];
     })
     active = false
-    currentpawn = null
+    activeMove = ""
+    // currentpawn = null
 
     if ((turn >= 7)&&(mode=="preNormal")){ 
         mode = "normal" // all pawn are inside the board.
     }
+})
+//SELECTING - place the pawn
+listEntry.forEach((ent)=>{
+    ent.elt.addEventListener("click",()=>{
+        if ((activeMove == "selecting")&&(active == true)){
+            if (currentpawn.container.legalEntries.indexOf(ent)!==-1){
+                if (!ent.filled){
+                    ent.elt.appendChild(currentpawn.elt)
+                    ent.filled = true
+                    ent.filledPawn = currentpawn
+                    currentpawn.container.filled = false
+                    currentpawn.container = ent
+                    currentpawn.status = "inside"
+
+                    active = false
+                    activeMove = ""
+                    currentpawn.elt.classList.remove("selected")
+                    // Alignement verification
+                    if (turn>=5){
+                        if (turn%2!=0){
+                            if (isAlign(a1,a2,a3)){
+                                mode = "Ended"
+                                Winner = "PLAYER 1"
+                                console.log(Winner+"Win")
+                                document.querySelector(".result span").innerHTML = Winner
+                                boardResult.style.display = "grid"
+                            }
+                        }else if (isAlign(b1,b2,b3)){
+                            mode = "Ended"
+                            Winner = "PLAYER 2"
+                            console.log(Winner+"Win")
+                            document.querySelector(".result span").innerHTML = Winner
+                            boardResult.style.display = "grid"
+                        }
+                    }
+                    turn++
+                    if ((turn >= 7)&&(mode=="preNormal")){ 
+                        mode = "normal" // all pawn are inside the board.
+                    }
+                }
+            }
+        }
+    })
 })
 
 let newParty = document.querySelector(".new-party")
@@ -200,7 +265,7 @@ newParty.addEventListener("click", ()=>{
     p2.appendChild(b3.elt)
 
     boardResult.style.display = "none"
-    board.style.display = "flex"
+    // board.style.display = "flex"
 
     listPawns.forEach((p)=> {
         p.initialX = center(p.elt)[0]
@@ -214,5 +279,4 @@ newParty.addEventListener("click", ()=>{
     })
     mode = "preNormal"
     turn = 1
-
 })
