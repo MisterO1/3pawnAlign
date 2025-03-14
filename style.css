@@ -37,6 +37,7 @@ section {
     border-radius: 50%;
     width: 60px;
     height: 60px;
+    cursor: pointer;
 }
 .model-pawn#a{
     background-color: #0000ff;
@@ -67,6 +68,7 @@ section {
     padding: 10px 15px;
     width: 200px;
     font-size: 1.4rem;
+    cursor: pointer;
 }
 .new-party button:active{
     background-color: rgb(9, 59, 237);
@@ -74,7 +76,7 @@ section {
 
 .option1,.option2{
     position: absolute;
-    z-index: 2;
+    /* z-index: 2; */
     display: grid;
     grid-template-columns: 60px 60px 60px;
     gap: 5px;
@@ -113,7 +115,10 @@ section {
 .model{
     position: relative;
 }
-.option1,.option2{
-    bottom: 100%;
-    right: 0;
+
+.option-space{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
 }

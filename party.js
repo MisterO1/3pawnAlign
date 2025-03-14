@@ -1,3 +1,6 @@
+let colorA = sessionStorage.getItem("colorA")
+let colorB = sessionStorage.getItem("colorB")
+
 const board = document.querySelector(".board")
 const boardResult = document.querySelector(".board-result")
 
@@ -41,26 +44,33 @@ containerGEN = {
 }
 
 class pawn {
-    constructor(name,elt) {
+    constructor(name,elt,color) {
         this.name = name ;
         this.elt = elt ;
+        this.color = color ;
         this.id = this.elt.id ;
         this.initialX = center(this.elt)[0];
         this.initialY = center(this.elt)[1];
         this.container = containerGEN; // just to permit to move the pawn all over the board
         this.status = "outside"; // outside the board
     }
+    toColor(){
+        this.elt.style.backgroundColor = this.color
+    }
 }
 
-const a1 = new pawn("a1",document.getElementById("a1"))
-const a2 = new pawn("a2",document.getElementById("a2"))
-const a3 = new pawn("a3",document.getElementById("a3"))
-const b1 = new pawn("b1",document.getElementById("b1"))
-const b2 = new pawn("b2",document.getElementById("b2"))
-const b3 = new pawn("b3",document.getElementById("b3"))
+const a1 = new pawn("a1",document.getElementById("a1"),colorA)
+const a2 = new pawn("a2",document.getElementById("a2"),colorA)
+const a3 = new pawn("a3",document.getElementById("a3"),colorA)
+const b1 = new pawn("b1",document.getElementById("b1"),colorB)
+const b2 = new pawn("b2",document.getElementById("b2"),colorB)
+const b3 = new pawn("b3",document.getElementById("b3"),colorB)
+let listPawns = [a1,a2,a3,b1,b2,b3]
+listPawns.forEach((p)=>{
+    p.toColor()
+})
 
 let Winner ;
-let listPawns = [a1,a2,a3,b1,b2,b3]
 let currentX;
 let currentY;
 let active = false
@@ -193,8 +203,6 @@ document.addEventListener("mouseup", function(e){
                 turn++
                 break
             }
-            
-            
         }
     }
     listPawns.forEach((p)=>{
@@ -280,4 +288,11 @@ newParty.addEventListener("click", ()=>{
     })
     mode = "preNormal"
     turn = 1
+})
+
+const goHome = document.querySelector(".board-result a")
+goHome.addEventListener("click",()=>{
+    sessionStorage.setItem("colorA",colorA)
+    sessionStorage.setItem("colorB",colorB)
+    window.location.href = "index.html"
 })
