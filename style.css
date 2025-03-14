@@ -122,3 +122,24 @@ section {
     height: 100%;
     background-color: transparent;
 }
+
+.msg-error{
+    position: absolute;
+    /* z-index: 3; */
+    bottom: 19%;
+    left: -300px;
+    background-color: #c64747;
+    /* height: fit-content; */
+    width: 270px;
+    padding: 0px 10px;
+    color: #fff;
+    /* transform: translate(-115%,0); */
+}
+
+.msg-error p{
+    font-size: 0.7em;
+    line-height: 1.2;
+}
+.msg-error i.ri-alert-line{
+    font-size: 1.7em;
+}

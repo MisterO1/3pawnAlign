@@ -71,8 +71,78 @@ function place(n){
 })
 
 const newParty = document.querySelector(".new-party button")
+const _msgError = document.querySelector(".msg-error")
+
 newParty.addEventListener("click",()=>{
-    sessionStorage.setItem("colorA",colorA)
-    sessionStorage.setItem("colorB",colorB)
-    window.location.href = "party.html"
+    if(colorA==null){
+        colorA = "#0000ff"
+    }
+    if(colorB==null){
+        colorB = "#ff0000"
+    }
+    if (colorA===colorB){   // set error message if we get the same color for both
+        startMsgError()
+        setTimeout(EndMsgError,2000)
+        // console.log('meme couleur')
+    }else{
+        sessionStorage.setItem("colorA",colorA)
+        sessionStorage.setItem("colorB",colorB)
+        window.location.href = "party.html"
+        // console.log('non')
+    }
 })
+
+
+// MESSAGE D'ERREUR
+const width = _msgError.getBoundingClientRect().width
+const duration = 1000; // 1 seconds
+const distance = width+50; // 400px to the right
+let start = null;
+
+// Ease-in-out function
+function easeInOut(t) {
+    return t < 0.5 
+        ? 2 * t * t 
+        : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+// Animation function
+function forward(time) {
+    if (!start) start = time; // Initialize start time on first call
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1); // Clamp progress between 0 and 1
+    const easedProgress = easeInOut(progress);
+
+    _msgError.style.transform = `translateX(${easedProgress * distance}px)`
+
+    if (progress < 1) {
+        requestAnimationFrame(forward);
+    } else {
+        start = null; // Reset start time for future animations
+    }
+}
+function backward(time) {
+    if (!start) start = time; // Initialize start time on first call
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1); // Clamp progress between 0 and 1
+    const easedProgress = easeInOut(progress);
+
+    _msgError.style.transform = `translateX(${(1-easedProgress) * distance}px)`
+
+    if (progress < 1) {
+        requestAnimationFrame(backward);
+    } else {
+        start = null; // Reset start time for future animations
+    }
+}
+// Start animation
+function startMsgError(){
+    if (!start) {
+        requestAnimationFrame(forward);
+    }
+}
+function EndMsgError(){
+    if (!start) {
+        requestAnimationFrame(backward);
+    }
+}
