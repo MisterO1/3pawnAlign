@@ -19,14 +19,14 @@ modelPawn2.style.backgroundColor = colorB
 
 let colors = ["#ff0000","#505022","#ffa500","#0000ff","#00ffff","#800080","#00ff00","#dea0ab","#a52a2a"]
 
-modelPawn1.addEventListener("click",()=>{
+modelPawn1.addEventListener("touchstart",()=>{
     optionSpace2.style.display = "none"
     currentModelPawn = modelPawn1
     optionSpace1.style.display = "grid"
     place(1)
     chosing = true
 })
-modelPawn2.addEventListener("click",()=>{
+modelPawn2.addEventListener("touchstart",()=>{
     optionSpace1.style.display = "none"
     currentModelPawn = modelPawn2
     optionSpace2.style.display = "grid"
@@ -35,7 +35,7 @@ modelPawn2.addEventListener("click",()=>{
 })
 
 allColorPawn.forEach((cp,ind)=>{
-    cp.addEventListener("click",()=>{
+    cp.addEventListener("touchstart",()=>{
         let color = colors[Number(cp.className[cp.className.length-1])-1]
         currentModelPawn.style.backgroundColor = color
         if (ind<9){
@@ -65,7 +65,7 @@ function place(n){
 }
 
 [optionSpace1,optionSpace2].forEach((os)=>{
-    os.addEventListener("click",()=>{
+    os.addEventListener("touchstart",()=>{
         os.style.display = "none"
     })
 })
@@ -73,76 +73,19 @@ function place(n){
 const newParty = document.querySelector(".new-party button")
 const _msgError = document.querySelector(".msg-error")
 
-newParty.addEventListener("click",()=>{
+newParty.addEventListener("touchstart",()=>{
+    console.log('active')
     if(colorA==null){
         colorA = "#0000ff"
     }
     if(colorB==null){
         colorB = "#ff0000"
     }
-    if (colorA===colorB){   // set error message if we get the same color for both
-        startMsgError()
-        setTimeout(EndMsgError,2000)
-        // console.log('meme couleur')
+    if ((colorA===colorB)){  // set error message if we get the same color for both
+        return
     }else{
         sessionStorage.setItem("colorA",colorA)
         sessionStorage.setItem("colorB",colorB)
         window.location.href = "party.html"
-        // console.log('non')
     }
 })
-
-
-// MESSAGE D'ERREUR
-const width = _msgError.getBoundingClientRect().width
-const duration = 1000; // 1 seconds
-const distance = width+50; // 400px to the right
-let start = null;
-
-// Ease-in-out function
-function easeInOut(t) {
-    return t < 0.5 
-        ? 2 * t * t 
-        : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
-
-// Animation function
-function forward(time) {
-    if (!start) start = time; // Initialize start time on first call
-    const elapsed = time - start;
-    const progress = Math.min(elapsed / duration, 1); // Clamp progress between 0 and 1
-    const easedProgress = easeInOut(progress);
-
-    _msgError.style.transform = `translateX(${easedProgress * distance}px)`
-
-    if (progress < 1) {
-        requestAnimationFrame(forward);
-    } else {
-        start = null; // Reset start time for future animations
-    }
-}
-function backward(time) {
-    if (!start) start = time; // Initialize start time on first call
-    const elapsed = time - start;
-    const progress = Math.min(elapsed / duration, 1); // Clamp progress between 0 and 1
-    const easedProgress = easeInOut(progress);
-
-    _msgError.style.transform = `translateX(${(1-easedProgress) * distance}px)`
-
-    if (progress < 1) {
-        requestAnimationFrame(backward);
-    } else {
-        start = null; // Reset start time for future animations
-    }
-}
-// Start animation
-function startMsgError(){
-    if (!start) {
-        requestAnimationFrame(forward);
-    }
-}
-function EndMsgError(){
-    if (!start) {
-        requestAnimationFrame(backward);
-    }
-}

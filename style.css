@@ -1,13 +1,21 @@
+html, body {
+    overflow: hidden;
+  }
+
 body{
     padding: 0;
     margin: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* border: 2px solid rgb(169, 30, 211); */
+
 }
 section {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,7 +84,6 @@ section {
 
 .option1,.option2{
     position: absolute;
-    /* z-index: 2; */
     display: grid;
     grid-template-columns: 60px 60px 60px;
     gap: 5px;
@@ -125,15 +132,11 @@ section {
 
 .msg-error{
     position: absolute;
-    /* z-index: 3; */
     bottom: 19%;
-    left: -300px;
     background-color: #c64747;
-    /* height: fit-content; */
     width: 270px;
     padding: 0px 10px;
     color: #fff;
-    /* transform: translate(-115%,0); */
 }
 
 .msg-error p{
