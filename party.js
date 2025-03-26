@@ -182,6 +182,7 @@ document.addEventListener("mouseup", function(e){
                 currentpawn.container.filled = false
                 currentpawn.container = ent
                 currentpawn.status = "inside"
+                currentpawn.elt.classList.remove("selected")
                 // Alignement verification
                 if (turn>=5){
                     if (turn%2!=0){
@@ -261,7 +262,7 @@ listEntry.forEach((ent)=>{
     })
 })
 
-// Now Party
+// New Party
 let newParty = document.querySelector(".new-party")
 let p1 = document.querySelector(".front-pawns-player1")
 let p2 = document.querySelector(".front-pawns-player2")
