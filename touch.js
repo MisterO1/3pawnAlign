@@ -35,8 +35,9 @@ modelPawn2.addEventListener("touchstart",()=>{
 })
 
 allColorPawn.forEach((cp,ind)=>{
-    cp.addEventListener("touchstart",()=>{
-        let color = colors[Number(cp.className[cp.className.length-1])-1]
+    cp.addEventListener("touchstart",(e)=>{
+        // let color = colors[Number(cp.className[cp.className.length-1])-1]
+        let color = window.getComputedStyle(cp).backgroundColor
         currentModelPawn.style.backgroundColor = color
         if (ind<9){
             colorA = color
@@ -48,6 +49,7 @@ allColorPawn.forEach((cp,ind)=>{
     })
 })
 
+// afficher les options juste au-dessus du pion
 function place(n){
     if (n==1){
         let x = optionSpace1.getBoundingClientRect().right - modelPawn1.getBoundingClientRect().right
@@ -81,7 +83,7 @@ newParty.addEventListener("touchstart",()=>{
     if(colorB==null){
         colorB = "#ff0000"
     }
-    if ((colorA===colorB)){  // set error message if we get the same color for both
+    if ((colorA===colorB)){                             // set error message if we get the same color for both
         return
     }else{
         sessionStorage.setItem("colorA",colorA)

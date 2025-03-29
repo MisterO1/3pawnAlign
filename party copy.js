@@ -70,7 +70,64 @@ listPawns.forEach((p)=>{
     p.toColor()
 })
 
-//---------LES FONCTIONS ----------------------------------------------------------
+let Winner ;
+let currentX;
+let currentY;
+let active = false
+let activeMove = ""
+let currentpawn //= a1 ;//initialiser
+let oldpawn // = Object.create(currentpawn) ;//initialiser
+let turn = 1 // only blue pawn can be played when turn = 1. same for player2 when turn = 2
+let mode = "preNormal" // only outside pawn can be played
+
+listPawns.forEach((p)=>{
+    if (mode != "Ended"){
+        // MOUSING
+        p.elt.addEventListener("touchstart", function(){
+            console.log("Pion sélectionné:", this.id)
+            if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
+                if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
+                    // indique le debut du mouvement
+                    active = true
+                    activeMove = "touching"
+                    // console.log(activeMove)
+
+                    oldpawn = Object.create(currentpawn)
+                    oldpawn.elt.classList.remove("selected")
+                    currentpawn = p
+                    currentpawn.elt.classList.add("selected")
+                    return
+                }
+            }
+        })
+        // SELECTING
+        p.elt.addEventListener("click", function(){
+            if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
+                if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
+                    // indique le debut du mouvement
+                    active = true
+                    activeMove = "selecting"
+                    // console.log(activeMove)
+
+                    oldpawn.elt.classList.remove("selected")
+                    // currentpawn = p // facultative because already done in mousing part
+                    currentpawn.elt.classList.add("selected")
+                }
+            }
+        })
+    }
+})
+
+document.addEventListener("touchmove", function(e){
+    if (!active){return }
+    if (activeMove != "touching"){return }
+    e.preventDefault()
+    let touch = e.touches[0];
+    currentX = touch.clientX - currentpawn.initialX
+    currentY = touch.clientY - currentpawn.initialY
+
+    currentpawn.elt.style.transform = `translate3d(${currentX}px,${currentY}px, 0)`
+}, { passive: false })  
 
 function isInside(area, x, y){
     let areaRect = area.getBoundingClientRect()
@@ -81,6 +138,7 @@ function isInside(area, x, y){
         y <= areaRect.bottom
     )
 }
+
 // obtenir la position du centre d'un element
 function center(element){
     let bounds = element.getBoundingClientRect()
@@ -101,7 +159,7 @@ function isAlign(pawn1,pawn2,pawn3){
     (pawn2.container.coordinates[1]==pawn3.container.coordinates[1]))
     {return true}
 
-    // diagonale alignement with 2 possibilities (y=x or y=-x)
+    // diagonale alignement => 2 possibilities (y=x or y=-x)
     if (((pawn1.container.coordinates[0]==pawn1.container.coordinates[1])&&
     (pawn2.container.coordinates[0]==pawn2.container.coordinates[1])&&
     (pawn3.container.coordinates[0]==pawn3.container.coordinates[1]))
@@ -113,85 +171,88 @@ function isAlign(pawn1,pawn2,pawn3){
 
     return false
 }
+//MOUSING - place the pawn
+document.addEventListener("touchend", function(e){
+    if (!active){return }
+    if (activeMove != "touching"){return }
+    let touch = e.changedTouches[0];
 
-// check if there is a Win and then display de pop-up
-function checkWin(){
-    if (turn>=5){
-        if (turn%2!=0){
-            if (isAlign(a1,a2,a3)){
-                mode = "Ended"
-                Winner = "PLAYER 1"
-                document.querySelector(".result span").textContent = Winner // ecrire le nom du winner
-                boardResult.style.display = "grid"
+    currentpawn.elt.style.transform = `translate3d(${0}px,${0}px, 0)`
+    for (ent of currentpawn.container.legalEntries){
+        if (isInside(ent.elt, touch.clientX, touch.clientY)){
+            if (!ent.filled){
+                ent.elt.appendChild(currentpawn.elt)
+                ent.filled = true
+                ent.filledPawn = currentpawn
+                currentpawn.container.filled = false
+                currentpawn.container = ent
+                currentpawn.status = "inside"
+                currentpawn.elt.classList.remove("selected")
+                // Alignement verification
+                if (turn>=5){
+                    if (turn%2!=0){
+                        if (isAlign(a1,a2,a3)){
+                            mode = "Ended"
+                            Winner = "PLAYER 1"
+                            document.querySelector(".result span").textContent = Winner
+                            boardResult.style.display = "grid"
+                        }
+                    }else if (isAlign(b1,b2,b3)){
+                        mode = "Ended"
+                        Winner = "PLAYER 2"
+                        document.querySelector(".result span").textContent = Winner
+                        boardResult.style.display = "grid"
+                    }
+                }
+                turn++
+                break
             }
-        }else if (isAlign(b1,b2,b3)){
-            mode = "Ended"
-            Winner = "PLAYER 2"
-            document.querySelector(".result span").textContent = Winner
-            boardResult.style.display = "grid"
         }
     }
-}
+    listPawns.forEach((p)=>{
+        p.initialX = center(p.elt)[0];
+        p.initialY = center(p.elt)[1];
+    })
+    active = false
+    activeMove = ""
+    // currentpawn = null
 
-// function to add a Pawn into an entry
-function putPawnIntoEntry(pawn,ent){
-    ent.elt.appendChild(pawn.elt)
-    ent.filled = true
-    ent.filledPawn = pawn
-    pawn.container.filled = false // l'ancien container est vide
-    pawn.container = ent // le nouveau container du currentpawn est "ent"
-    pawn.status = "inside" 
-    pawn.elt.classList.remove("selected") // enlève la selection
-}
-
-// -----------------------------------------------------------------------
-let Winner ;
-let currentX;
-let currentY;
-let active = false
-let currentpawn = null //= a1 ;//initialiser
-let turn = 1 // only blue pawn can be played when turn = 1. same for player2 when turn = 2
-let mode = "preNormal" // only outside pawn can be played
-
-// SELECTIONNER SON PION
-listPawns.forEach((p)=>{
-    if ((mode != "Ended")){
-        p.elt.addEventListener("touchstart", function(){
-            if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
-                if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
-                    if (!currentpawn){                              // currentpawn est null juste pour le 1er tour
-                        currentpawn = p
-                        currentpawn.elt.classList.add("selected")
-                        active = true
-                    }
-                    // else if (p.name === currentpawn.name){         // on desélectionne le pion si on le touche 2x de suite
-                    //     currentpawn.elt.classList.remove("selected")
-                    //     currentpawn = null
-                    //     active = false
-                    // }
-                    else{                                          // on mets à jour le currentpawn
-                        currentpawn.elt.classList.remove("selected")
-                        currentpawn = p
-                        currentpawn.elt.classList.add("selected")
-                        active = true
-                    }  
-                }
-            }
-        })
+    if ((turn >= 7)&&(mode=="preNormal")){ 
+        mode = "normal" // all pawn are inside the board.
     }
 })
-
-// DEPOSER SON PION DANS LES ENTRY APRES L'AVOIR SELECTIONER
+//SELECTING - place the pawn
 listEntry.forEach((ent)=>{
-    ent.elt.addEventListener("touchstart",()=>{
-        // console.log("currentPawn is : "+ currentpawn)
-        if ((active == true)&&(currentpawn != null)){                       // un pion doit être sélectionné avant tout
-            if (currentpawn.container.legalEntries.indexOf(ent)!==-1){      // l'entry doit fait partir du legalEntry du currentpawn
-                if (!ent.filled){                                           // l'entry doit être vide pour pouvoir recevoir un pion
-                    putPawnIntoEntry(currentpawn,ent)                       // on mets le pion dans l'entry
+    ent.elt.addEventListener("click",()=>{
+        if ((activeMove == "selecting")&&(active == true)){
+            if (currentpawn.container.legalEntries.indexOf(ent)!==-1){
+                if (!ent.filled){
+                    ent.elt.appendChild(currentpawn.elt)
+                    ent.filled = true
+                    ent.filledPawn = currentpawn
+                    currentpawn.container.filled = false
+                    currentpawn.container = ent
+                    currentpawn.status = "inside"
+
                     active = false
-                    currentpawn = null
-                    checkWin()                                              // on verifie s'il y a victoire à chaque tour
+                    activeMove = ""
+                    currentpawn.elt.classList.remove("selected")
+                    // Alignement verification
+                    if (turn>=5){
+                        if (turn%2!=0){
+                            if (isAlign(a1,a2,a3)){
+                                mode = "Ended"
+                                Winner = "PLAYER 1"
+                                document.querySelector(".result span").textContent = Winner
+                                boardResult.style.display = "grid"
+                            }
+                        }else if (isAlign(b1,b2,b3)){
+                            mode = "Ended"
+                            Winner = "PLAYER 2"
+                            document.querySelector(".result span").textContent = Winner
+                            boardResult.style.display = "grid"
+                        }
+                    }
                     turn++
                     if ((turn >= 7)&&(mode=="preNormal")){ 
                         mode = "normal" // all pawn are inside the board.
@@ -201,51 +262,6 @@ listEntry.forEach((ent)=>{
         }
     })
 })
-
-
-// DEPLACER SON PION
-document.addEventListener("touchmove", function(e){
-    if (!active){return }
-    e.preventDefault()
-    let touch = e.touches[0];
-    currentX = touch.clientX - currentpawn.initialX
-    currentY = touch.clientY - currentpawn.initialY
-
-    currentpawn.elt.style.transform = `translate3d(${currentX}px,${currentY}px, 0)`
-}, { passive: false })  
-
-//DEPOSER LE PION APRES AVOIR DEPLACER
-document.addEventListener("touchend", function(e){
-    if (!active){return }
-    let touch = e.changedTouches[0];
-
-    currentpawn.elt.style.transform = `translate3d(${0}px,${0}px, 0)`
-    for (ent of currentpawn.container.legalEntries){
-        if (isInside(ent.elt, touch.clientX, touch.clientY)){
-            if (!ent.filled){
-                putPawnIntoEntry(currentpawn,ent)
-                currentpawn = null
-                active = false
-                checkWin()  // Alignement verification
-                turn++
-                break
-            }
-        }
-    }
-    // mise à jour des positions des pions pour les prochaines translation lors du touchmove
-    listPawns.forEach((p)=>{
-        p.initialX = center(p.elt)[0];
-        p.initialY = center(p.elt)[1];
-    })
-    // mise à jour de la phase du jeu
-    if ((turn >= 7)&&(mode=="preNormal")){ 
-        mode = "normal" // all pawn are inside the board.
-    }
-})
-
-
-////Place the pawn BY TOUCHING an entry
-
 
 // New Party
 let newParty = document.querySelector(".new-party")
