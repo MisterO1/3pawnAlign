@@ -11,7 +11,7 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid rgb(227, 19, 19);
+    /* border: 1px solid rgb(227, 19, 19); */
 }
 .presentation{
     position: relative;
@@ -34,7 +34,7 @@ section {
     width: 350px;
     height: 500px;
     /* background-color: rgb(91, 232, 197); */
-    border: 1px solid rgb(0, 255, 94);
+    /* border: 1px solid rgb(0, 255, 94); */
 }
 .board-result{
     position: absolute;
@@ -69,16 +69,16 @@ section {
     width: max-content;
     padding: 10px;
     background-color: #bfc0c2;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 .player-information .name{
-    color: #fff;
+    color: #000;
 }
 
 .front-entry{
     width: fit-content;
     height: fit-content;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     display: grid;
     grid-template-columns: repeat(3,60px);
     gap: 10px;
@@ -104,7 +104,7 @@ section {
 .front-pawns{
     width: fit-content;
     height: fit-content;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     display: flex;
     flex-direction: row;
     justify-content: center;

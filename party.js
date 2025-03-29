@@ -83,17 +83,19 @@ let mode = "preNormal" // only outside pawn can be played
 listPawns.forEach((p)=>{
     if (mode != "Ended"){
         // MOUSING
-        p.elt.addEventListener("mousedown", function(){
+        p.elt.addEventListener("touchstart", function(){
             if (((mode == "preNormal")&&(p.status == "outside")) || ((mode == "normal")&&(p.status == "inside"))){
                 if(((turn%2 != 0) && (p.id[0]=="a")) || ((turn%2 == 0) && (p.id[0]=="b"))){
                     // indique le debut du mouvement
                     active = true
-                    activeMove = "mousing"
+                    activeMove = "touching"
+                    console.log(activeMove)
 
                     oldpawn = Object.create(currentpawn)
                     oldpawn.elt.classList.remove("selected")
                     currentpawn = p
                     currentpawn.elt.classList.add("selected")
+                    return
                 }
             }
         })
@@ -104,6 +106,7 @@ listPawns.forEach((p)=>{
                     // indique le debut du mouvement
                     active = true
                     activeMove = "selecting"
+                    console.log(activeMove)
 
                     oldpawn.elt.classList.remove("selected")
                     // currentpawn = p // facultative because already done in mousing part
@@ -114,17 +117,16 @@ listPawns.forEach((p)=>{
     }
 })
 
-document.addEventListener("mousemove", function(e){
+document.addEventListener("touchmove", function(e){
     if (!active){return }
-    if (activeMove != "mousing"){return }
+    if (activeMove != "touching"){return }
     e.preventDefault()
-    
-    currentX = e.clientX - currentpawn.initialX
-    currentY = e.clientY - currentpawn.initialY
+    let touch = e.touches[0];
+    currentX = touch.clientX - currentpawn.initialX
+    currentY = touch.clientY - currentpawn.initialY
 
     currentpawn.elt.style.transform = `translate3d(${currentX}px,${currentY}px, 0)`
-
-})
+}, { passive: false })  
 
 function isInside(area, x, y){
     let areaRect = area.getBoundingClientRect()
@@ -168,13 +170,14 @@ function isAlign(pawn1,pawn2,pawn3){
     return false
 }
 //MOUSING - place the pawn
-document.addEventListener("mouseup", function(e){
+document.addEventListener("touchend", function(e){
     if (!active){return }
-    if (activeMove != "mousing"){return }
+    if (activeMove != "touching"){return }
+    let touch = e.changedTouches[0];
 
     currentpawn.elt.style.transform = `translate3d(${0}px,${0}px, 0)`
     for (ent of currentpawn.container.legalEntries){
-        if (isInside(ent.elt, e.clientX, e.clientY)){
+        if (isInside(ent.elt, touch.clientX, touch.clientY)){
             if (!ent.filled){
                 ent.elt.appendChild(currentpawn.elt)
                 ent.filled = true
@@ -189,14 +192,12 @@ document.addEventListener("mouseup", function(e){
                         if (isAlign(a1,a2,a3)){
                             mode = "Ended"
                             Winner = "PLAYER 1"
-                            console.log(Winner+"Win")
                             document.querySelector(".result span").innerHTML = Winner
                             boardResult.style.display = "grid"
                         }
                     }else if (isAlign(b1,b2,b3)){
                         mode = "Ended"
                         Winner = "PLAYER 2"
-                        console.log(Winner+"Win")
                         document.querySelector(".result span").innerHTML = Winner
                         boardResult.style.display = "grid"
                     }
@@ -240,14 +241,12 @@ listEntry.forEach((ent)=>{
                             if (isAlign(a1,a2,a3)){
                                 mode = "Ended"
                                 Winner = "PLAYER 1"
-                                console.log(Winner+"Win")
                                 document.querySelector(".result span").innerHTML = Winner
                                 boardResult.style.display = "grid"
                             }
                         }else if (isAlign(b1,b2,b3)){
                             mode = "Ended"
                             Winner = "PLAYER 2"
-                            console.log(Winner+"Win")
                             document.querySelector(".result span").innerHTML = Winner
                             boardResult.style.display = "grid"
                         }
@@ -275,7 +274,6 @@ newParty.addEventListener("click", ()=>{
     p2.appendChild(b3.elt)
 
     boardResult.style.display = "none"
-    // board.style.display = "flex"
 
     listPawns.forEach((p)=> {
         p.initialX = center(p.elt)[0]
